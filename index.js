@@ -10,6 +10,7 @@ const db = require("./db")
 //npm i bcrypt
 const bcrypt = require("bcrypt")
 
+//Cadastro de um cliente
 app.post("/cliente", async (req, res) => {
     try{
         const cliente = req.body
@@ -28,8 +29,32 @@ app.post("/cliente", async (req, res) => {
         res.status(500).json({erro: error.message}) 
     }
 })
-
-
+//Consulta de todos os clientes
+app.get("/cliente", async (req, res) => {
+    try{
+        const clientes = await db.pool.query(
+            `SELECT nome, cpf, celular, email FROM Cliente`
+        )
+        res.status(200).json(clientes[0])
+    }catch(error){
+        res.status(500).json({reposta: error.message})
+    }
+})
+//Consulta de um cliente específico
+app.get("/cliente/:cpf", async (req, res) => {
+    try{
+        const cpf = req.params.cpf
+        const cliente = await db.pool.query(
+            `SELECT nome, cpf, celular, email FROM Cliente WHERE ?`, [cliente.cpf = cpf]
+        )
+        if (!cliente) {
+            res.status(404).json({ erro: "Cliente não existe no banco de dados!" });
+          }
+            res.status(200).json(cliente[0]);
+    }catch(error){
+        res.status(500).json({resposta: error.message})
+    }
+})
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
