@@ -48,7 +48,7 @@ app.get("/cliente/:id", async (req, res) => {
             `SELECT id, nome, cpf, celular, email FROM Cliente WHERE id = ?`, [id]
         )
         if (resultado[0].length == 0) {
-            return res.status(404).json({ erro: "Cliente não existe no banco de dados!" });
+            return res.status(404).json({erro: "Cliente não existe no banco de dados!"});
           }
             res.status(200).json(resultado[0]);
     }catch(error){
@@ -63,7 +63,7 @@ app.delete("/cliente/:id", async (req, res) => {
             `DELETE FROM Cliente WHERE id = ?`, [id]
         )
         if (resultado[0].affectedRows == 0){
-            return res.status(404).json({ erro: "Não existe cliente com esse id!"});
+            return res.status(404).json({erro: "Não existe cliente com esse id!"});
         }
             res.status(200).json({resposta: "Cliente deletado."});
     }catch(error){
@@ -72,26 +72,43 @@ app.delete("/cliente/:id", async (req, res) => {
 })
 //Alteração dos dados de um cliente
 app.patch("/cliente/:id", async (req, res) => {
-    try{
-        const cliente_at = req.body
+    try {
         const id = req.params.id
-        const resultado = await db.pool.query(
-            `UPDATE Cliente SET nome = ?, cpf = ?, celular = ?, email = ? WHERE id = ?`,
-            [cliente_at.nome, cliente_at.cpf, cliente_at.celular, cliente_at.email, id]
-        )
-        if (resultado[0].affectedRows == 0){
-            return res.status(404).json({erro:"Não existe cliente com esse id!"})
+        const cliente_at = req.body
+        const camposPermitidos = ['nome', 'cpf', 'celular', 'email']
+        const atualizacoes = []
+        const valores = []
+
+        for (const campo of camposPermitidos) {
+            if (cliente_at[campo] !== undefined) {
+                atualizacoes.push(`${campo} = ?`);
+                valores.push(cliente_at[campo]);
+            }
         }
-            res.status(200).json({resposta: "Cliente atualizado."});
-    }catch(error){
-        res.status(500).json({resposta: error.message})
+        if (atualizacoes.length === 0) {
+            return res.status(400).json({erro: "Nenhum campo válido para atualizar!"});
+        }
+        valores.push(id);
+
+        const sql = `UPDATE Cliente SET ${atualizacoes.join(", ")} WHERE id = ?`;
+        const resultado = await db.pool.query(sql, valores);
+
+        if (resultado[0].affectedRows == 0) {
+            return res.status(404).json({erro: "Não existe cliente com esse id!"});
+        }
+        res.status(200).json({ resposta: "Cliente atualizado." });
+
+    } catch (error) {
+        res.status(500).json({ resposta: error.message });
     }
-})
+});
+
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
 })
 
+/*MODELO
 /*{
     "nome": "Débora Novo",
     "cpf": "781.101.101-01",
