@@ -29,6 +29,29 @@ app.post("/cliente", async (req, res) => {
         res.status(500).json({erro: error.message}) 
     }
 })
+//Login de um cliente
+app.post("/login", async (req, res) => {
+    try{
+        //primeiro encontramos um CLIENTE com esse email e senha. Ou seja, apenas o que escolhemos.
+        const user = req.body
+        const resultado = await db.pool.query(
+            `SELECT email, senha FROM Cliente WHERE email = ?`, [user.email]
+        )
+        // A partir dele, salvamos os dados do cliente em uma variável.
+        const dados_bd = resultado[0][0]
+        if(!dados_bd){
+            return res.status(401).json({msg: "Email não cadastrado!"})
+        }
+        //Daí como já existe esse cliente com esse email, podemos comparar a senha dele com a que for usada no POST. 
+        if(user.senha === dados_bd.senha){
+            return res.status(200).json({msg:"Login realizado com sucesso"})
+        }
+        return res.status(400).json({msg:"Senha incorreta"})
+        
+    } catch(error){
+        res.status(500).json({erro: error.message})
+    }
+})
 //Consulta de todos os clientes
 app.get("/cliente", async (req, res) => {
     try{
@@ -117,3 +140,10 @@ app.listen(port, ()=>{
     "senha":"dy2905"
   }
 */
+
+/* TESTE LOGIN 
+{
+  "email":"hoje@gmail.com",
+  "senha":"$2b$10$nfHrbAZgQvefgQwvNvH9BewGZXM90ntbU1EJM0FixBI8ifvn33Fp2"
+}
+*/ 
