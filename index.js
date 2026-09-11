@@ -9,6 +9,14 @@ const db = require("./db")
 
 //npm i bcrypt
 const bcrypt = require("bcrypt")
+// npm i cors
+const cors = require("cors")
+app.use(cors())
+//npm i jsonwebtoken
+const jwt = require("jsonwebtoken")
+//npm i dotenv
+const dotenv = require("dotenv")
+dotenv.config()
 
 //Cadastro de um cliente
 app.post("/cliente", async (req, res) => {
@@ -24,7 +32,7 @@ app.post("/cliente", async (req, res) => {
             ) VALUES (?, ?, ?, ?, ?)`, 
             [cliente.nome, cliente.cpf, cliente.celular, cliente.email, cliente.senha]
         )
-        res.status(201).json({mensagem: "Cliente cadastrado com ID = "+ resultado[0].insertId})
+        res.status(201).json({msg: "Cliente cadastrado com ID = "+ resultado[0].insertId})
     } catch(error){
         res.status(500).json({erro: error.message}) 
     }
@@ -35,18 +43,26 @@ app.post("/login", async (req, res) => {
         //primeiro encontramos um CLIENTE com esse email e senha. Ou seja, apenas o que escolhemos.
         const user = req.body
         const resultado = await db.pool.query(
-            `SELECT email, senha FROM Cliente WHERE email = ?`, [user.email]
+            `SELECT id, nome, email, senha FROM Cliente WHERE email = ?`, [user.email]
         )
         // A partir dele, salvamos os dados do cliente em uma variável.
         const dados_bd = resultado[0][0]
         if(!dados_bd){
             return res.status(401).json({msg: "Email não cadastrado!"})
         }
-        //Daí como já existe esse cliente com esse email, podemos comparar a senha dele com a que for usada no POST. 
-        if(user.senha === dados_bd.senha){
-            return res.status(200).json({msg:"Login realizado com sucesso"})
+        // comparação da senha q esta no body com a senha que foi retirada do bd
+        const senha_valida = bcrypt.compare(user.senha, dados_bd.senha)
+
+        if(!senha_valida){
+            return res.status(400).json({msg:"Credenciais inválidas!"})
         }
-        return res.status(400).json({msg:"Senha incorreta"})
+        //JWT (JSON WEB TOKEN)
+        const payload = {
+            id: dados_bd.id,
+            email: dados_bd.email
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1m'})
+        return res.status(200).json({nome: dados_bd.nome, token: token})
         
     } catch(error){
         res.status(500).json({erro: error.message})
