@@ -50,9 +50,10 @@ app.post("/login", async (req, res) => {
         if(!dados_bd){
             return res.status(401).json({msg: "Email não cadastrado!"})
         }
+    
         // comparação da senha q esta no body com a senha que foi retirada do bd
-        const senha_valida = bcrypt.compare(user.senha, dados_bd.senha)
-
+        const senha_valida = await bcrypt.compare(user.senha, dados_bd.senha)
+    
         if(!senha_valida){
             return res.status(400).json({msg:"Credenciais inválidas!"})
         }
@@ -142,10 +143,37 @@ app.patch("/cliente/:id", async (req, res) => {
     }
 });
 
+app.get("/cliente/perfil", autenticar, async (req, res)=>{
+    try {
+        const id = req.usuario.id
+        const result = await db.pool.query("SELECT * FROM cliente WHERE id = ?", [id]);
+        const perfil = result[0][0]
+        delete perfil.senha
+        res.status(200).json(perfil)
+    } catch (err) {
+        res.status(500).json({ erro: 'Erro interno' });
+        throw err;
+    }
+})
+
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
 })
+
+function autenticar(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null){
+        return res.status(401).json({erro: "Token não enviado, usar Authorization Bearer <token>"})
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, usuario) => {
+        if (err) return res.status(403).json({erro: "Token inválido"})
+        req.usuario = usuario
+        next()
+    })   
+}
+
 
 /*MODELO
 /*{
@@ -163,3 +191,13 @@ app.listen(port, ()=>{
   "senha":"$2b$10$nfHrbAZgQvefgQwvNvH9BewGZXM90ntbU1EJM0FixBI8ifvn33Fp2"
 }
 */ 
+// Rotas que faltam:
+/*GET /cliente/perfil *
+DELETE /cliente/perfil *
+GET /produto
+GET /produto/:id
+POST /compra *
+GET /compra *
+GET /compra/:id *
+
+* = necessidade de autenticação do cliente.*/
