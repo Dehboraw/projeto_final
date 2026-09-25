@@ -1,0 +1,121 @@
+/* Importando uma fonte mais moderna e "limpa" */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #fcd5ce; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+main {
+    background-color: #f8edeb;
+    width: 40%;
+    max-width: 50%; 
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(192, 132, 132, 0.05); 
+}
+
+h1 {
+    color: #fffaff;
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+h2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    margin: 30px 0 15px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 10px;
+}
+
+form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #444444;
+    margin-bottom: 8px;
+}
+
+p{
+    color: rgb(0, 0, 0);
+
+} 
+input[type="text"],
+input[type="email"],
+input[type="date"],
+input[type="tel"],
+input[type="password"],
+#senha {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #2d3748;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+
+input:focus {
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.btn_enviar {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background-color: #ffb5a7; 
+    color:rgb(26, 26, 26);
+    font-weight: 600;
+    font-size: 16px;
+    border: 1.5px solid #001735;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn_enviar:hover {
+    background-color: #ffa69e;
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+}
+
+.btn_entrar {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background-color: #ffb5a7; 
+    color:rgb(26, 26, 26);
+    font-weight: 600;
+    font-size: 16px;
+    border: 1.5px solid #001735;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn_entrar:hover {
+    background-color: #ffa69e;
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);
+}
+
+#estado {
+    width: 80px;
+}
