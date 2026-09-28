@@ -7,7 +7,8 @@ const pool = mysql.createPool({
     port: 3306, 
     user: 'root', 
     password: 'escola',
-    database: '2triDeboraDSC'
+    database: '2triDeboraDSC',
+    multipleStatements: ''
 })
 
 module.exports = Object.freeze({
