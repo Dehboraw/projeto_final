@@ -1,2 +1,0 @@
-Criar arquivo .env:
-JWT_SECRET=ajnmanpolahqwlgkign@&swij
