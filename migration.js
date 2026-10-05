@@ -14,7 +14,7 @@ async function criar_estrutura(){
                     PRIMARY KEY (id),
                     UNIQUE KEY cpf (cpf),
                     UNIQUE KEY email (email)
-              ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+              ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4;
               INSERT INTO Cliente VALUES 
               (12,'Deh','45687126305','12365322587','teste@gmail.com','$2b$10$bPZvgQKCIjIHgC.LZ74A3e9KCdpfqHrecFLvt3ABXVxM3HF.TEUx.'),
               (13,'Mario souza','12345678900','41963254785','mario@gmail.com','$2b$10$sVuJe4F5fnFKZflxBitgwek.l2UgHErABxYReq20Rs.Mx380KjdcK'),
