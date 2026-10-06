@@ -1,8 +1,11 @@
 // npm init
 // npm express
+//npm i dotenv
+const dotenv = require("dotenv")
+dotenv.config()
 const express = require("express")
 const app = express()
-const port = 3000
+const port = process.env.API_PORT
 app.use(express.json())
 
 const db = require("./db")
@@ -14,9 +17,6 @@ const cors = require("cors")
 app.use(cors())
 //npm i jsonwebtoken
 const jwt = require("jsonwebtoken")
-//npm i dotenv
-const dotenv = require("dotenv")
-dotenv.config()
 
 //Cadastro de um cliente
 app.post("/cliente", async (req, res) => {
