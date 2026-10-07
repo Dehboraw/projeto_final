@@ -22,8 +22,10 @@ async function criar_estrutura(){
 
         `)
     console.log("Migração de estrutura do bd finalizada")
+    process.exit(0)
     }catch(error){
         console.log(error)
+        process.exit(1)
     }
 }
 
