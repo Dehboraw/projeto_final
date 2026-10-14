@@ -156,6 +156,32 @@ app.get("/cliente/perfil", autenticar, async (req, res)=>{
     }
 })
 
+app.get("/produto", async (req, res) => {
+    try{
+        const produtos = await db.pool.query(
+            `SELECT id, nome, descricao, categoria, preco, caminho_img, quantidade_img FROM Produto`
+        )
+        res.status(200).json(produtos[0])
+        console.log(produtos[0])
+    }catch(error){
+        res.status(500).json({reposta: error.message})
+    }
+})
+
+app.get("/produto/:id", async (req,res) => {
+    try{
+        const id = req.params.id
+        const resultado = await db.pool.query(
+            `SELECT id, nome, descricao, categoria, preco, caminho_img, quantidade_img FROM Produto WHERE id = ?`, [id]
+        )
+        if (resultado[0].length == 0) {
+            return res.status(404).json({erro: "Esse produto não existe no banco de dados!"});
+          }
+            res.status(200).json(resultado[0]);
+    }catch(error){
+        res.status(500).json({resposta: error.message})
+    }
+})
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
@@ -175,27 +201,13 @@ function autenticar(req, res, next){
 }
 
 
-/*MODELO
-/*{
-    "nome": "Débora Novo",
-    "cpf": "781.101.101-01",
-    "celular": "(42)45122-7894",
-    "email": "hoje@gmail.com",
-    "senha":"dy2905"
-  }
-*/
 
-/* TESTE LOGIN 
-{
-  "email":"hoje@gmail.com",
-  "senha":"$2b$10$nfHrbAZgQvefgQwvNvH9BewGZXM90ntbU1EJM0FixBI8ifvn33Fp2"
-}
-*/ 
+
 // Rotas que faltam:
 /*GET /cliente/perfil *
 DELETE /cliente/perfil *
-GET /produto
-GET /produto/:id
+GET /produto ok
+GET /produto/:id ok
 POST /compra *
 GET /compra *
 GET /compra/:id *
