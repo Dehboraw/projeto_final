@@ -156,23 +156,22 @@ app.get("/cliente/perfil", autenticar, async (req, res)=>{
     }
 })
 
-app.get("/produto", async (req, res) => {
+app.get("/produtos", async (req, res) => {
     try{
         const produtos = await db.pool.query(
-            `SELECT id, nome, descricao, categoria, preco, caminho_img, quantidade_img FROM Produto`
+            `SELECT * FROM Produto`
         )
         res.status(200).json(produtos[0])
-        console.log(produtos[0])
     }catch(error){
         res.status(500).json({reposta: error.message})
     }
 })
-
-app.get("/produto/:id", async (req,res) => {
+// path parameter
+app.get("/produto/:id", async (req,res) => { 
     try{
         const id = req.params.id
         const resultado = await db.pool.query(
-            `SELECT id, nome, descricao, categoria, preco, caminho_img, quantidade_img FROM Produto WHERE id = ?`, [id]
+            `SELECT * FROM Produto WHERE id = ?`, [id]
         )
         if (resultado[0].length == 0) {
             return res.status(404).json({erro: "Esse produto não existe no banco de dados!"});
@@ -180,6 +179,23 @@ app.get("/produto/:id", async (req,res) => {
             res.status(200).json(resultado[0]);
     }catch(error){
         res.status(500).json({resposta: error.message})
+    }
+})
+
+app.get("/produto", async (req, res) => {
+    try{
+        // Query Parameters
+        const { busca } = req.query
+        let resultado
+        if (busca){
+            resultado = await db.pool.query(`SELECT * FROM Produto WHERE nome LIKE ?`, ["%" + busca + "%"])
+        } else {
+            resultado = await db.pool.query(`SELECT * FROM Produto`)
+        }
+        
+        res.status(200).json(resultado[0])
+    }catch(error){
+        res.status(500).json({reposta: error.message})
     }
 })
 
