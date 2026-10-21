@@ -184,15 +184,23 @@ app.get("/produto/:id", async (req,res) => {
 
 app.get("/produto", async (req, res) => {
     try{
+        let sql = "SELECT * FROM Produto WHERE 1=1"
+        const params = []
         // Query Parameters
-        const { busca } = req.query
+        const { busca, ordenacao } = req.query
         let resultado
         if (busca){
-            resultado = await db.pool.query(`SELECT * FROM Produto WHERE nome LIKE ?`, ["%" + busca + "%"])
-        } else {
-            resultado = await db.pool.query(`SELECT * FROM Produto`)
+            sql += " AND nome LIKE ?"
+            params.push(`%${busca}%`)
+        } 
+        if (ordenacao) {
+            if (ordenacao == "maior preco") {
+                sql += " ORDER BY preco DESC"
+            } else {
+                sql += " ORDER BY preco ASC"
+            }
         }
-        
+        resultado = await db.pool.query(sql, params)
         res.status(200).json(resultado[0])
     }catch(error){
         res.status(500).json({reposta: error.message})
