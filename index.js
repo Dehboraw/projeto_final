@@ -187,12 +187,25 @@ app.get("/produto", async (req, res) => {
         let sql = "SELECT * FROM Produto WHERE 1=1"
         const params = []
         // Query Parameters
-        const { busca, ordenacao, categoria} = req.query
+        const { busca, ordenacao, categoria, pagina, preco_min, preco_max} = req.query
         let resultado
         if (busca){
             sql += " AND nome LIKE ?"
             params.push(`%${busca}%`)
         } 
+        if (categoria) {
+            sql += " AND categoria = ?"
+            params.push(`${categoria}`)
+        }
+        if (preco_max) {
+            sql += " AND preco <= ?"
+            params.push(`${preco_max}`)
+        }
+        if (preco_min) {
+            sql += " AND preco >= ?"
+            params.push(`${preco_min}`)
+        }
+        
         if (ordenacao) {
             if (ordenacao == "maior preco") {
                 sql += " ORDER BY preco DESC"
@@ -200,10 +213,13 @@ app.get("/produto", async (req, res) => {
                 sql += " ORDER BY preco ASC"
             }
         }
-        if (categoria) {
-            sql += " AND categoria LIKE ?"
-            params.push(`%${categoria}%`)
+        if (pagina) {
+            const offset = (pagina - 1)*16
+            sql += " LIMIT 16 OFFSET " + offset
+        } else {
+            sql += " LIMIT 16"
         }
+
         resultado = await db.pool.query(sql, params)
         res.status(200).json(resultado[0])
     }catch(error){
