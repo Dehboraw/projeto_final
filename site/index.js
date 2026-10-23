@@ -1,8 +1,9 @@
 import { buscar_produtos } from "./api"
 
 async function carregar_produtos() {
+    let produtos
     try {
-        const produtos = await buscar_produtos()
+        produtos = await buscar_produtos()
         alert(JSON.stringify(produtos))
     } catch (error) {
         alert(error)
