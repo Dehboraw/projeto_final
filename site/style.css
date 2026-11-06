@@ -54,11 +54,7 @@ p{
     color: rgb(0, 0, 0);
 
 } 
-input[type="text"],
-input[type="email"],
-input[type="date"],
-input[type="tel"],
-input[type="password"],
+.input_texto,
 #senha {
     width: 100%;
     padding: 12px 16px;
