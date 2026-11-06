@@ -183,49 +183,80 @@ app.get("/produto/:id", async (req,res) => {
 })
 
 app.get("/produto", async (req, res) => {
-    try{
-        let sql = "SELECT * FROM Produto WHERE 1=1"
-        const params = []
-        // Query Parameters
-        const { busca, ordenacao, categoria, pagina, preco_min, preco_max} = req.query
-        let resultado
-        if (busca){
-            sql += " AND nome LIKE ?"
-            params.push(`%${busca}%`)
-        } 
+    try {
+        let sql = "SELECT * FROM Produto WHERE 1=1";
+        const params = [];
+
+        const {
+            busca,
+            ordenacao,
+            categoria,
+            pagina,
+            preco_min,
+            preco_max
+        } = req.query;
+
+        if (busca) {
+            sql += " AND nome LIKE ?";
+            params.push(`%${busca}%`);
+        }
         if (categoria) {
-            sql += " AND categoria = ?"
-            params.push(`${categoria}`)
+            sql += " AND categoria = ?";
+            params.push(categoria);
         }
         if (preco_max) {
-            sql += " AND preco <= ?"
-            params.push(`${preco_max}`)
+            sql += " AND preco <= ?";
+            params.push(preco_max);
         }
         if (preco_min) {
-            sql += " AND preco >= ?"
-            params.push(`${preco_min}`)
+            sql += " AND preco >= ?";
+            params.push(preco_min);
         }
-        
-        if (ordenacao) {
-            if (ordenacao == "maior preco") {
-                sql += " ORDER BY preco DESC"
-            } else {
-                sql += " ORDER BY preco ASC"
-            }
-        }
-        if (pagina) {
-            const offset = (pagina - 1)*16
-            sql += " LIMIT 16 OFFSET " + offset
-        } else {
-            sql += " LIMIT 16"
-        }
+        const sqlContagem = sql.replace(
+            "SELECT *",
+            "SELECT COUNT(*) AS total"
+        );
+        const resultadoContagem = await db.pool.query(
+            sqlContagem,
+            params
+        );
+        const total = resultadoContagem[0][0].total;
 
-        resultado = await db.pool.query(sql, params)
-        res.status(200).json(resultado[0])
-    }catch(error){
-        res.status(500).json({reposta: error.message})
+        if (ordenacao === "maior preco") {
+            sql += " ORDER BY preco DESC";
+        } else if (ordenacao === "menor preco") {
+            sql += " ORDER BY preco ASC";
+        }
+        const porPagina = 16;
+        const totalPaginas = Math.ceil(total / porPagina);
+
+        const paginaSolicitada = Math.max(
+            1,
+            parseInt(pagina, 10) || 1
+        );
+        const paginaAtual = totalPaginas === 0
+            ? 1
+            : Math.min(paginaSolicitada, totalPaginas);
+        const offset = (paginaAtual - 1) * porPagina;
+        
+        sql += " LIMIT ? OFFSET ?";
+        params.push(porPagina, offset);
+
+        const resultado = await db.pool.query(sql, params);
+
+        res.status(200).json({
+            produtos: resultado[0],
+            total: total,
+            pagina: paginaAtual,
+            totalPaginas: totalPaginas
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            resposta: error.message
+        });
     }
-})
+});
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
