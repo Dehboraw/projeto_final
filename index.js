@@ -269,7 +269,53 @@ app.post("/compra", autenticar, async (req,res)=>{
     // forma de pagamento 
     // puxar a data do servidor para salvar no bd
     // lista de produtos (somente os ids e qtd de cada item)
+    const id_cliente = req.usuario.id;
+    const { forma_pagamento, produtos } = req.body;
 
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransction();
+        let valorTotal = 0;
+        const itensProcessados = [];
+
+        for (const item of produtos) {
+            const [rows] = await connection.query(
+                "SELECT id, nome, preco, estoque FROM Produto WHERE id = ?" [item.id]
+            );
+
+            const produtoBanco = rows[0];
+            if (!produtoBanco) {
+            throw new Error(`Produto ID ${item.id} não encontrado.`);
+            }
+            if (produtoBanco.estoque < item.qtd) {
+                throw new Error (`Estoque insuficiente para o produto: ${produtoBanco.nome}`);
+            }
+            const subtotal = produtoBanco.preco * item.qtd;
+            valorTotal += subtotal;
+
+            itensProcessados.push({
+                id_produto: item.id,
+                qtd: item.qtd,
+                preco_unitario: produtoBanco.preco
+            });
+        }
+
+        await connection.query(
+            "UPDATE Produto SET estoque = estoque - ? WHERE id =?", [item.qtd, item.id]
+        );
+
+        const dataServidor = new Date();
+
+        const [resultadoCompra] = await connection.query(
+            "INSERT INTO Compra (id_cliente, data_compra, forma_pagamento, valor_total) VALUES (?,?,?,?)",
+            [id_cliente, dataServidor, forma_pagamento, valorTotal]
+        );
+        const idCompraGerado = resultadoCompra.insertId;
+
+
+
+    } catch(error){}
     // busca por cada produto no banco de dados -SELECT
     // pegar o valor de cada produto, multiplicar pela qtd
     // reduzir a qtd em estoque (UPDATE)
