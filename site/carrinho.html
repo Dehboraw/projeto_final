@@ -54,7 +54,28 @@
     </nav>
   </header>
     <main>
-        <h1>Carrinho...</h1>
+      <div class="container my-5">
+        <h2 class="mb-4">Minhas Compras</h2>
+
+        <!-- Filtro simples opcional mantendo sua lógica de URL -->
+        <div class="row g-2 mb-4">
+            <div class="col-md-4">
+                <select id="select-ordem" class="form-select" onchange="carregar_compras(true)">
+                    <option value="">Mais recentes</option>
+                    <option value="antigas">Mais antigas</option>
+                    <option value="maior_valor">Maior valor</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Container onde os cards das compras serão renderizados -->
+        <div id="compras"></div>
+
+        <!-- Container da paginação -->
+        <nav aria-label="Navegação de páginas" class="mt-4">
+            <ul id="paginacao" class="pagination justify-content-center"></ul>
+        </nav>
+    </div>
     
     </main>
     <footer>
@@ -63,6 +84,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     
   <script src="./pages.js"></script>
+  <script src="api.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>         
 
