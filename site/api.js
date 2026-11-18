@@ -15,3 +15,19 @@ async function buscar_produtos(queryParams){
     const resposta_json = await resposta.json();
     return resposta_json;
 }
+
+async function buscar_compra(queryParams){
+    let rota = "/compra"
+    const queryString = queryParams.toString()
+    if(queryString){
+        rota+= "?" + queryString
+    } 
+    const resposta = await fetch(link_api + rota);
+
+    if (!resposta.ok) {
+        throw new Error("Erro ao buscar suas compras");
+    }
+
+    const resposta_json = await resposta.json();
+    return resposta_json;
+}
