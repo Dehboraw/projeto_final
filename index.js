@@ -267,13 +267,11 @@ app.post("/compra", autenticar, async (req,res)=>{
     // Dados necessários:
     // token 
     // forma de pagamento 
-    // puxar a data do servidor para salvar no bd
     // lista de produtos (somente os ids e qtd de cada item)
     const id_cliente = req.usuario.id;
     const { forma_pagamento, produtos } = req.body;
 
     const connection = await db.getConnection();
-
     try {
         await connection.beginTransction();
         let valorTotal = 0;
@@ -283,7 +281,6 @@ app.post("/compra", autenticar, async (req,res)=>{
             const [rows] = await connection.query(
                 "SELECT id, nome, preco, estoque FROM Produto WHERE id = ?" [item.id]
             );
-
             const produtoBanco = rows[0];
             if (!produtoBanco) {
             throw new Error(`Produto ID ${item.id} não encontrado.`);
@@ -304,26 +301,144 @@ app.post("/compra", autenticar, async (req,res)=>{
         await connection.query(
             "UPDATE Produto SET estoque = estoque - ? WHERE id =?", [item.qtd, item.id]
         );
-
+        // puxar a data do servidor para salvar no bd
         const dataServidor = new Date();
 
         const [resultadoCompra] = await connection.query(
-            "INSERT INTO Compra (id_cliente, data_compra, forma_pagamento, valor_total) VALUES (?,?,?,?)",
+            "INSERT INTO Compra (idCliente, data_da_compra, forma_pagamento, valor_total) VALUES (?,?,?,?)",
             [id_cliente, dataServidor, forma_pagamento, valorTotal]
         );
         const idCompraGerado = resultadoCompra.insertId;
 
+        for (const item of itensProcessados) {
+            await connection.query(
+                "INSERT INTO CompraProduto (idCompra, idProduto, quantidade, valor_unitario) VALUES (?, ?, ?, ?)",
+                [idCompraGerado, item.id_produto, item.qtd, item.preco_unitario]
+            );
+        }
+
+        await connection.commit();
+
+        return res.status(201).json({ 
+            mensagem: "Compra realizada com sucesso!",
+            id_compra: idCompraGerado,
+            valor_total: valorTotal
+        });
+
+        } catch (error) {
+            await connection.rollback();
+            return res.status(400).json({ 
+            erro: error.message || "Erro ao processar a compra." 
+            });
+        } finally {
+        connection.release();
+        }
+    });
 
 
-    } catch(error){}
     // busca por cada produto no banco de dados -SELECT
     // pegar o valor de cada produto, multiplicar pela qtd
     // reduzir a qtd em estoque (UPDATE)
     // fazer a soma do valor total
     // cadastrar a compra na tabela "compra"
     // cadastrar cliente e produto na tabela "compra_produto"
-    // se der tudo certo "compra realizada com sucesso"
-})
+    // se der tudo certo "compra realizada com sucesso
+
+app.get("/compras", autenticar, async (req, res) => {
+    const id_cliente = req.usuario.id;
+    const connection = await db.getConnection();
+
+    try {
+        // 1. Busca todas as compras realizadas pelo usuário logado
+        const [compras] = await connection.query(
+            `SELECT id, data_da_compra, forma_pagamento, valor_total 
+             FROM Compra 
+             WHERE idCliente = ? 
+             ORDER BY data_da_compra DESC`,
+            [id_cliente]
+        );
+
+        // Se o usuário ainda não tiver compras, retorna uma lista vazia
+        if (compras.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        // 2. Para cada compra, busca os itens vinculados e o nome do produto
+        for (const compra of compras) {
+            const [itens] = await connection.query(
+                `SELECT 
+                    cp.idProduto AS id_produto,
+                    p.nome,
+                    cp.quantidade AS qtd,
+                    cp.valor_unitario
+                 FROM CompraProduto cp
+                 INNER JOIN Produto p ON cp.idProduto = p.id
+                 WHERE cp.idCompra = ?`,
+                [compra.id]
+            );
+
+            // Anexa a lista de produtos dentro do objeto da compra
+            compra.produtos = itens;
+        }
+
+        return res.status(200).json(compras);
+
+    } catch (error) {
+        return res.status(500).json({
+            erro: error.message || "Erro ao consultar as compras."
+        });
+    } finally {
+        connection.release();
+    }
+});
+
+app.get("/compras", autenticar, async (req, res) => {
+    const id_cliente = req.usuario.id;
+    const connection = await db.getConnection();
+
+    try {
+        // 1. Busca todas as compras realizadas pelo usuário logado
+        const [compras] = await connection.query(
+            `SELECT id, data_da_compra, forma_pagamento, valor_total 
+             FROM Compra 
+             WHERE idCliente = ? 
+             ORDER BY data_da_compra DESC`,
+            [id_cliente]
+        );
+
+        // Se o usuário ainda não tiver compras, retorna uma lista vazia
+        if (compras.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        // 2. Para cada compra, busca os itens vinculados e o nome do produto
+        for (const compra of compras) {
+            const [itens] = await connection.query(
+                `SELECT 
+                    cp.idProduto AS id_produto,
+                    p.nome,
+                    cp.quantidade AS qtd,
+                    cp.valor_unitario
+                 FROM CompraProduto cp
+                 INNER JOIN Produto p ON cp.idProduto = p.id
+                 WHERE cp.idCompra = ?`,
+                [compra.id]
+            );
+
+            // Anexa a lista de produtos dentro do objeto da compra
+            compra.produtos = itens;
+        }
+
+        return res.status(200).json(compras);
+
+    } catch (error) {
+        return res.status(500).json({
+            erro: error.message || "Erro ao consultar as compras."
+        });
+    } finally {
+        connection.release();
+    }
+});
 
 app.listen(port, ()=>{
     console.log("API rodando na porta " + port)
