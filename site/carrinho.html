@@ -1,92 +1,138 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="style.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <title>Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <title>Meu carrinho</title>
 </head>
+
 <body>
-  <header>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-      <div class="container-fluid">
-        <a class="navbar-brand">
-          <img src="logo.png" height="75">
-        </a>
-        <button id="user-info" class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="nav-link">Opções</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-          <div class="offcanvas-body">
-            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.html">Produtos</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="carrinho.html">Carrinho</a>
-              </li>
-              <li id="nav-login" class="nav-item">
-                <a class="nav-link" href="login.html">Realize o login</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a id="cli-info" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"aria-expanded="false">
-                  Nome
+
+    <header>
+
+        <nav class="navbar navbar-dark bg-dark fixed-top">
+
+            <div class="container-fluid">
+
+                <a class="navbar-brand" href="index.html">
+                    <img src="logo.png" height="75" alt="Logo">
                 </a>
-                <ul class="dropdown-menu dropdown-menu-dark">
-                  <li><a class="dropdown-item" href="cadastro.html">Perfil</a></li>
-                  <li>
-                    <hr class="dropdown-divider">
-                  </li>
-                  <li><a class="dropdown-item" href="#" onclick="logout()">Sair</a></li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-    <main>
-      <div class="container my-5">
-        <h2 class="mb-4">Minhas Compras</h2>
 
-        <!-- Filtro simples opcional mantendo sua lógica de URL -->
-        <div class="row g-2 mb-4">
-            <div class="col-md-4">
-                <select id="select-ordem" class="form-select" onchange="carregar_compras(true)">
-                    <option value="">Mais recentes</option>
-                    <option value="antigas">Mais antigas</option>
-                    <option value="maior_valor">Maior valor</option>
-                </select>
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasDarkNavbar">
+
+                    <span class="navbar-toggler-icon"></span>
+
+                </button>
+
+                <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1"
+                    id="offcanvasDarkNavbar">
+
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title">Opções</h5>
+
+                        <button type="button" class="btn-close btn-close-white"
+                            data-bs-dismiss="offcanvas">
+                        </button>
+                    </div>
+
+                    <div class="offcanvas-body">
+
+                        <ul class="navbar-nav">
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html">Produtos</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link active" href="carrinho.html">Carrinho</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="compra.html">Finalizar compra</a>
+                            </li>
+
+                            <li id="nav-login" class="nav-item">
+                                <a class="nav-link" href="login.html">Realize o login</a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a id="cli-info" class="nav-link dropdown-toggle"
+                                    href="#" role="button" data-bs-toggle="dropdown">
+                                    Nome
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-dark">
+
+                                    <li>
+                                        <a class="dropdown-item" href="cadastro.html">Perfil</a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider"></li>
+
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="logout()">Sair</a>
+                                    </li>
+
+                                </ul>
+                            </li>
+
+                        </ul>
+
+                    </div>
+                </div>
             </div>
+        </nav>
+
+    </header>
+
+    <main class="container" style="padding-top: 120px; max-width: 900px;">
+
+        <h1 class="text-center mb-4">Meu carrinho</h1>
+
+        <!-- Lista de produtos -->
+        <div id="lista-carrinho" class="list-group mb-4">
+
         </div>
 
-        <!-- Container onde os cards das compras serão renderizados -->
-        <div id="compras"></div>
+        <!-- Total -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <!-- Container da paginação -->
-        <nav aria-label="Navegação de páginas" class="mt-4">
-            <ul id="paginacao" class="pagination justify-content-center"></ul>
-        </nav>
-    </div>
-    
+            <h3>Total:</h3>
+
+            <h3 id="valor-total">R$ 0,00</h3>
+
+        </div>
+
+        <!-- Botões -->
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+
+            <a href="index.html" class="btn btn-secondary">
+                Continuar comprando
+            </a>
+
+            <button id="btn-finalizar" class="btn btn-success"
+                onclick="finalizar_compra()">
+                Finalizar compra
+            </button>
+
+        </div>
+
     </main>
-    <footer>
 
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    
-  <script src="./pages.js"></script>
-  <script src="api.js"></script>
-  <script src="index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="./pages.js"></script>
+
+    <script src="./carrinho.js"></script>
+
 </body>
-</html>         
-
-<!---->
+</html>
