@@ -1,8 +1,5 @@
-// Recuperar produtos do carrinho
 let produtos = JSON.parse(localStorage.getItem("carrinho")) || [];
 
-
-// Formatar preço
 function formatarPreco(valor) {
 
     return Number(valor).toLocaleString("pt-BR", {
@@ -12,8 +9,6 @@ function formatarPreco(valor) {
 
 }
 
-
-// Mostrar Toast
 function mostrarToast(mensagem, cor) {
 
     const toastElement = document.getElementById("liveToast");
@@ -31,7 +26,6 @@ function mostrarToast(mensagem, cor) {
 }
 
 
-// Mostrar produtos da compra
 function carregar_produtos() {
 
     const container = document.getElementById("lista-produtos");
@@ -100,8 +94,6 @@ function carregar_produtos() {
 
 }
 
-
-// Pegar dados da compra
 function pegar_dados() {
 
     const dados = {
@@ -122,8 +114,6 @@ function pegar_dados() {
 
 }
 
-
-// Enviar compra
 const form_compra = document.getElementById("form_compra");
 
 const btn_enviar = document.getElementById("btn_enviar");
@@ -140,7 +130,7 @@ form_compra.addEventListener("submit", async (event) => {
 
     }
 
-    // Recuperar token
+
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -185,13 +175,11 @@ form_compra.addEventListener("submit", async (event) => {
 
         }
 
-        // Compra realizada
         mostrarToast(
             `Compra realizada com sucesso! Pedido nº ${resultado.id_compra}`,
             "bg-success"
         );
 
-        // Limpar carrinho
         localStorage.removeItem("carrinho");
 
         produtos = [];
@@ -219,8 +207,6 @@ form_compra.addEventListener("submit", async (event) => {
 
 });
 
-
-// Carregar página
 window.addEventListener("DOMContentLoaded", () => {
 
     carregar_produtos();
